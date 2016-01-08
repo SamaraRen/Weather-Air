@@ -1,4 +1,6 @@
-var rootUrl = 'api.openweathermap.org/data/2.5/weather?';
+var rootUrl = 'http://api.wunderground.com/api/a5dfe909b64e6900//conditions/q/';
+//http://api.wunderground.com/api/a5dfe909b64e6900/conditions/q/CA/San_Francisco.json
+
 //api.openweathermap.org/data/2.5/weather?q={city name}
 
 var kelvinToF = function(kelvin) {
@@ -10,19 +12,21 @@ var kelvinToC = function(kelvin) {
 	return Math.round(kelvin-273.15) + ' ˚C'
 };
 //template string
-module.exports = function(latitude, longitude) {
-  var url = `${rootUrl}lat=${latitude}&lon=${longitude}&APPID=3db9d162a42fd1a53941c17d5c159d46`;
+module.exports = function(city, state) {
+  //var url = `${rootUrl}lat=${latitude}&lon=${longitude}&APPID=3db9d162a42fd1a53941c17d5c159d46`;
+  var url = `${rootUrl}${state}/${city}.json`;
   return fetch(url)
     .then(function(response){
-      console.log(response)
   	  return response.json();
   	})
   	.then(function(json){
   		return {
-  		  city: json.sys.name,
-  		  tempF: kelvinToF(json.main.temp),
-  		  tempC: kelvinToC(json.main.temp),
-  		  description: _.capitalize(json.weather[0].description)
+  		  //tempF: kelvinToF(json.main.temp),
+  		  //tempC: kelvinToC(json.main.temp),
+  		  //description: _.capitalize(json.weather[0].description)
+        tempF: json.current_observation.temp_f,
+        tempC: json.current_observation.temp_c,
+        description: json.current_observation.icon,
   		}
   	});
 }

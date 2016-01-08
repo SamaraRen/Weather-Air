@@ -6,12 +6,12 @@ module.exports = function(latitude, longitude) {
   var url = `${rootUrl}${latitude},${longitude}&key=AIzaSyDyxgYqThVBztGnurQnCE_oj0vsCx6_FPY`;
   return fetch(url)
     .then(function(response){
-    	console.log(response)
   	  return response.json();
   	})
   	.then(function(json){
   		return {
   		  city: json.results[0].address_components[1].long_name,
+  		  state: json.results[0].address_components[4].short_name,
   		}
   	});
 }

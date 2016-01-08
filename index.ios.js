@@ -11,6 +11,7 @@ var {
   Text,
   View,
   MapView,
+  TouchableHighlight,
 } = React;
 
 var Api = require('./src/api');
@@ -25,6 +26,7 @@ var Weather = React.createClass({
         longitude: 0,
       },
       city: '',
+      state: '',
       tempF: '',
       tempC: '',
       description: '',
@@ -32,6 +34,7 @@ var Weather = React.createClass({
       pm2_5: '',
       quality: '',
       primary_pollutant: '',
+      f: true,
     };
   },
   render: function() {
@@ -44,20 +47,39 @@ var Weather = React.createClass({
       <View style={styles.textWrapper}>
         <Text style={styles.text}>{this.state.city}
         </Text>
-        <Text style={styles.text}>{this.state.tempF}
-        </Text>
+        <View>
+          {this.fOrCText()}
+        </View>
         <Text style={styles.text}>{this.state.description}
         </Text>
-        <Text style={styles.text}>{this.state.aqi}
-        </Text>
-        <Text style={styles.text}>{this.state.pm2_5}
-        </Text>
-        <Text style={styles.text}>{this.state.quality}
-        </Text>
-        <Text style={styles.text}>{this.state.primary_polution}
-        </Text>
+        <View style={styles.buttonWrapper}>
+          {this.fOrCButton()}
+        </View>
       </View>
     </View>
+  },
+  fOrC: function() {
+    if (this.state.f == true) {
+      this.setState({f: false});
+    }
+    else {
+      this.setState({f: true});
+    }
+  },
+  fOrCButton: function() {
+    return <TouchableHighlight
+    underlayColor="gray"
+    onPress={this.fOrC}
+    style={styles.button}>
+        <Text style={styles.t}>
+          {this.state.f ? '˚F' : '˚C'}
+        </Text>
+      </TouchableHighlight>
+  },
+  fOrCText: function() {
+    return <Text style={styles.text}>
+          {this.state.f ? this.state.tempF+"˚F" : this.state.tempC+"˚C"}
+        </Text>
   },
   onRegionChangeComplete: function(region) {
     this.setState({
@@ -66,17 +88,18 @@ var Weather = React.createClass({
         latitude: region.latitude,
       },
     });
-    Api(region.latitude, region.longitude)
-      .then((data) => {
-        this.setState(data);
-      });
     Mapapi(region.latitude, region.longitude)
       .then((city) => {
         this.setState(city)
-      Airapi(this.state.city)
-        .then((info) => {
-          this.setState(info);
-        })
+        Api(this.state.city, this.state.state)
+          .then((data) => {
+            this.setState(data);
+          });
+        Airapi(this.state.city)
+          .then((info) => {
+            console.log(info)
+            this.setState(info);
+          })
       })
   },
 });
@@ -98,10 +121,43 @@ var styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 30,
+    fontSize: 25,
+  },
+  temp: {
+    flexDirection: 'row',
+    alignItems: 'stretch'
+  },
+  t: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 25
+  },
+  button: {
+    backgroundColor: '002058',
+    borderWidth: 2,
+    borderColor: 'E87722',
+    height: 50,
+    width: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonWrapper: {//green
+    flex: 5, // takes up 5/8ths of the available space
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 });
 
 AppRegistry.registerComponent('Weather', () => Weather);
 
 //93e87bf97d422de142f8fa8d0771e5a6
+
+//<Text style={styles.text}>{this.state.aqi}
+//</Text>
+//<Text style={styles.text}>{this.state.pm2_5}
+//</Text>
+//<Text style={styles.text}>{this.state.quality}
+//</Text>
+//<Text style={styles.text}>{this.state.primary_polution}
+//</Text>
