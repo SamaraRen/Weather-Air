@@ -2,7 +2,8 @@ var rootUrl = 'http://www.pm25.in/api/querys/pm2_5.json?city=';
 //beijing&token=5j1znBVAsnSf5xQyNQyq
 //template string
 module.exports = function(city) {
-  var url = `${rootUrl}${city}&token=5j1znBVAsnSf5xQyNQyq`;
+  var tcity = city.toLowerCase()
+  var url = `${rootUrl}${tcity}&token=5j1znBVAsnSf5xQyNQyq`;
   return fetch(url)
     .then(function(response){
   	  return response.json();

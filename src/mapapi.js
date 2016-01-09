@@ -9,9 +9,11 @@ module.exports = function(latitude, longitude) {
   	  return response.json();
   	})
   	.then(function(json){
+      var city = json.results[0].address_components[2].long_name.split(' ')[0]
   		return {
-  		  city: json.results[0].address_components[1].long_name,
+  		  city: city,
   		  state: json.results[0].address_components[4].short_name,
+        country: json.results[0].address_components[5].short_name,
   		}
   	});
 }

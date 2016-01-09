@@ -15,6 +15,7 @@ var {
 } = React;
 
 var Api = require('./src/api');
+var ApiChina = require('./src/apichina');
 var Airapi = require('./src/airapi');
 var Mapapi = require('./src/mapapi');
 //{"aqi":50,"area":"广州","pm2_5":33,"pm2_5_24h":34,"position_name":"广雅中学","primary_pollutant":null,"quality":"优","station_code":"1345A","time_point":"2016-01-08T06:00:00Z"},
@@ -27,6 +28,7 @@ var Weather = React.createClass({
       },
       city: '',
       state: '',
+      country: '',
       tempF: '',
       tempC: '',
       description: '',
@@ -47,16 +49,35 @@ var Weather = React.createClass({
       <View style={styles.textWrapper}>
         <Text style={styles.text}>{this.state.city}
         </Text>
-        <View>
-          {this.fOrCText()}
+        <View style={styles.temp}>
+            {this.fOrCText()}
+          <Text style={styles.text}>    {this.state.description}
+          </Text>
         </View>
-        <Text style={styles.text}>{this.state.description}
-        </Text>
+        {this.airText()}
         <View style={styles.buttonWrapper}>
           {this.fOrCButton()}
         </View>
       </View>
     </View>
+  },
+  airText: function() {
+    if (this.state.country=='US') {
+      return <View>
+          <View style={styles.air}>
+            <Text style={styles.airtext}>空气质量指数: {this.state.aqi}
+            </Text>
+            <Text style={styles.airtext}>   PM2.5: {this.state.pm2_5}
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.airtext}>空气质量: {this.state.quality}
+            </Text>
+            <Text style={styles.airtext}>   主要污染物: {this.state.primary_pollutant}
+            </Text>
+          </View>
+        </View>
+    }
   },
   fOrC: function() {
     if (this.state.f == true) {
@@ -90,16 +111,22 @@ var Weather = React.createClass({
     });
     Mapapi(region.latitude, region.longitude)
       .then((city) => {
+        console.log(city)
         this.setState(city)
-        Api(this.state.city, this.state.state)
-          .then((data) => {
-            this.setState(data);
-          });
-        Airapi(this.state.city)
-          .then((info) => {
-            console.log(info)
-            this.setState(info);
-          })
+        if (this.state.country=='US') {
+          console.log(this.state.city)
+          Api(this.state.city, this.state.state)
+            .then((data) => {
+              this.setState(data);
+            });
+        }
+        else if (this.state.country!='US') {
+          console.log(this.state.city)
+          Api(this.state.city, this.state.state)
+            .then((data) => {
+              this.setState(data);
+            });
+        }
       })
   },
 });
@@ -121,7 +148,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontSize: 25,
+    fontSize: 20,
   },
   temp: {
     flexDirection: 'row',
@@ -147,6 +174,16 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  air: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  airtext: {
+    fontSize: 15,
+  },
+  temp: {
+    flexDirection: 'row',
+  }
 });
 
 AppRegistry.registerComponent('Weather', () => Weather);
